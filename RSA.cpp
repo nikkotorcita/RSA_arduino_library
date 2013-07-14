@@ -12,11 +12,11 @@ RSA::~RSA()
 
 }
 
-void RSA::encrypt(char *plainText, char *cipherText, long *publicKey)
+void RSA::encrypt(char *plainText, char *cipherText, int *publicKey)
 {
    long m = 1;
-   long n = publicKey[0];
-   long e = publicKey[1];
+   int n = publicKey[0];
+   int e = publicKey[1];
    int ctr = 0;
 
    for(int i = 0; i < PLAINTEXT_SIZE; i++) {
@@ -24,37 +24,35 @@ void RSA::encrypt(char *plainText, char *cipherText, long *publicKey)
            m = (m * plainText[i]) % n;
        }
        
-       ctr = i * sizeof(long);
+       ctr = i * sizeof(int);
 
-       cipherText[ctr]     = (char) (m & 0x000000ff);
-       cipherText[ctr + 1] = (char) ((m & 0x0000ff00) >> 8);
-       cipherText[ctr + 2] = (char) ((m & 0x00ff0000) >> 16);
-       cipherText[ctr + 3] = (char) ((m & 0xff000000) >> 24);
+       cipherText[ctr]     = (char) (m & 0x00ff);
+       cipherText[ctr + 1] = (char) ((m & 0xff00) >> 8);
 
        m = 1;
    }
 
-#if DEBUG
-   Serial.println("==========BEGIN CIPHERTEXT==========");
+#if 1
+   Serial.println("\n==========BEGIN CIPHERTEXT==========");
    for(int i = 0; i < CIPHERTEXT_SIZE; i++) {
        Serial.print(cipherText[i]);
    }
-   Serial.println("\n===========END CIPHERTEXT===========");
+   Serial.println("\n===========END CIPHERTEXT===========\n");
 #endif
 }
 
-void RSA::decrypt(char *plainText, char *cipherText, long *privateKey)
+void RSA::decrypt(char *plainText, char *cipherText, int *privateKey)
 {
    long M = 1;
-   long n = privateKey[0];
-   long d = privateKey[1];
-   long temp = 0;
+   int n = privateKey[0];
+   int d = privateKey[1];
+   int temp = 0;
    int ctr = 0;
 
    //re-assemble char array to array of long
    for(int i = 0; i < PLAINTEXT_SIZE; i++) {
-       ctr = i * sizeof(long);
-       temp = (((unsigned char)cipherText[ctr + 3] << 24) | ((unsigned char)cipherText[ctr + 2] << 16) | ((unsigned char)cipherText[ctr + 1] << 8) | (unsigned char)cipherText[ctr]);
+       ctr = i * sizeof(int);
+       temp = (((unsigned char)cipherText[ctr + 1] << 8) | (unsigned char)cipherText[ctr]);
        
        for(int j = 0; j < d; j++) {
            M = (M * temp) % n;
@@ -66,10 +64,10 @@ void RSA::decrypt(char *plainText, char *cipherText, long *privateKey)
    }
 
 #if DEBUG
-   Serial.println("==========BEGIN PLAINTEXT==========");
+   Serial.println("\n==========BEGIN PLAINTEXT==========");
    for(int i = 0; i < PLAINTEXT_SIZE; i++)
        Serial.print(plainText[i]); 
-   Serial.println("\n===========END PLAINTEXT===========");
+   Serial.println("\n===========END PLAINTEXT===========\n");
 #endif
 }
 
