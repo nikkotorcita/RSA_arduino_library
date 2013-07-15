@@ -1,7 +1,7 @@
 #ifndef __RSA__
 #define __RSA__
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define SMS_SIZE            160
 #define PLAINTEXT_SIZE      (SMS_SIZE / sizeof(int))
